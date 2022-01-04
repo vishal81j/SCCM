@@ -1,0 +1,17 @@
+SELECT DISTINCT SYS.Netbios_Name0 as Name,
+SF.FileName, SF.FileDescription, SF.FileVersion, SF.FileSize, SF.FileModifiedDate, SF.FilePath,
+SYS.User_Name0 as 'User Name', MAX(IPSub.IP_Subnets0) as 'Subnet', sys.AD_Site_Name0 as ADSite, MAX(SYSOU.System_OU_Name0) as 'OU'
+FROM v_GS_SoftwareFile SF
+join v_R_System SYS on SYS.ResourceID = SF.ResourceID
+LEFT JOIN v_RA_System_IPSubnets IPSub on SYS.ResourceID = IPSub.ResourceID
+LEFT JOIN v_GS_COMPUTER_SYSTEM CSYS on SYS.ResourceID = CSYS.ResourceID
+LEFT JOIN v_GS_OPERATING_SYSTEM OPSYS on SYS.ResourceID=OPSYS.ResourceID
+LEFT JOIN v_GS_WORKSTATION_STATUS HWSCAN on SYS.ResourceID = HWSCAN.ResourceID
+LEFT JOIN v_GS_PC_BIOS BIOS on SYS.ResourceID = BIOS.ResourceID
+LEFT JOIN v_RA_System_SystemOUName SYSOU on SYS.ResourceID=SYSOU.ResourceID
+LEFT JOIN v_R_User USR on SYS.User_Name0 = USR.User_Name0
+LEFT JOIN v_FullCollectionMembership FCM on SYS.ResourceID = FCM.ResourceID
+Where SF.FileName LIKE 'vSEC_CMS_T_USS.exe'
+GROUP BY SYS.Netbios_Name0,SF.FileName, SF.FileDescription, SF.FileVersion, SF.FileSize, SF.FileModifiedDate,
+SF.FilePath, SYS.User_Name0, CSYS.Manufacturer0, CSYS.Model0, BIOS.SerialNumber0, sys.AD_Site_Name0
+ORDER BY SYS.Netbios_Name0

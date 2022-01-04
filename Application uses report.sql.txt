@@ -1,0 +1,31 @@
+Declare @Collection varchar(8)
+Set @Collection = ''-- specify scope collection ID 
+Select
+Distinct VRS.Name0 as 'MachineName',
+Os.Caption0 as 'OperatingSystem',
+St.SystemType00 as 'OSType',
+VRS.AD_Site_Name0 as 'ADSite',
+--VRS.Full_Domain_Name0 as 'Domain',
+VRS.User_Name0 as 'UserName',
+--v_R_User.Mail0 as 'EMailID',
+--HWSCAN.LastHWScan as 'LastHWScan',
+App.ARPDisplayName0 as 'DisplayName',
+App.InstallDate0 as 'InstalledDate',
+abs(DATEDIFF(day,getdate(),max(usage.LastUsedTime0))) as 'Days Since Used',
+MAX(Usage.LastUsedTime0) as 'Date Last Used',
+App.ProductVersion0 as 'Version'
+from V_R_System VRS
+Left JOIN v_GS_INSTALLED_SOFTWARE App ON VRS.ResourceID = App.ResourceID
+LEFT JOIN v_GS_CCM_RECENTLY_USED_APPS Usage on VRS.ResourceID = Usage.ResourceID
+LEFT JOIN Computer_System_DATA St on VRS.ResourceID = st.MachineID
+LEFT JOIN v_GS_OPERATING_SYSTEM Os on VRS.ResourceID = Os.ResourceID
+LEFT JOIN v_GS_WORKSTATION_STATUS HWSCAN on VRS.ResourceID = HWSCAN.ResourceID
+LEFT Join v_FullCollectionMembership as Col on VRS.ResourceID = Col.ResourceID
+LEFT JOIN v_R_User on VRS.User_Name0 = v_R_User.User_Name0
+Where App.ARPDisplayName0 like '%Microsoft%Visio%'
+and VRS.Operating_System_Name_and0 like '%Workstation%'
+and Col.CollectionID = @Collection
+--and VRS.Client0 = 1 and VRS.Obsolete0 = 0
+--order by VRS.Name0, App.ProductVersion0,Usage.LastUsedTime0
+group by LastUsedTime0,VRS.Name0, App.ProductVersion0,Os.Caption0,st.SystemType00,vrs.AD_Site_Name0,VRS.Full_Domain_Name0,
+VRS.User_Name0,v_R_User.Mail0,HWSCAN.LastHWScan,app.ARPDisplayName0,app.InstallDate0

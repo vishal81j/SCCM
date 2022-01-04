@@ -1,0 +1,18 @@
+Declare @CollectionID Varchar(8) 
+Set @CollectionID = 'SMS00001' 
+select Vrs.Name0 as 'Computer Name', Vrs.User_Name0 as 'User Name', 
+case when Vrs.client0 = 1 then 'Installed' else 'NotInstalled' end as 'ClientAgentStatus', 
+summ.ClientStateDescription, 
+case when summ.ClientActiveStatus = 0 then 'Inactive'
+when summ.ClientActiveStatus = 1 then 'Active' end as 'ClientActiveStatus', 
+summ.LastActiveTime,
+System_Disc.Last_Logon_Timestamp0 as 'LastLogon',
+DateDiff(D, System_Disc.Last_Logon_Timestamp0, GetDate()) 'LastLogonDays',
+System_Disc.Distinguished_Name0 as 'OUName' 
+from V_R_System Vrs 
+Left join v_CH_ClientSummary summ on Vrs.ResourceID = summ.ResourceID 
+left outer join System_Disc on System_Disc.ItemKey = VRS.ResourceId
+Where Vrs.ResourceID in (select ResourceID from v_FullCollectionMembership fcm 
+where fcm.CollectionID = @CollectionID) and 
+Vrs.Operating_System_Name_and0 like '%Workstation%'
+order by Vrs.Name0

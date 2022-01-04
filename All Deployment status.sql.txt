@@ -1,0 +1,12 @@
+select * from fn_ListLatestApplicationCIs(1033)
+select * from v_DeploymentSummary
+SELECT        fn_ListLatestApplicationCIs_1.DisplayName, fn_ListLatestApplicationCIs_1.DateCreated, fn_ListLatestApplicationCIs_1.DateLastModified, fn_ListLatestApplicationCIs_1.Manufacturer, 
+                         fn_ListLatestApplicationCIs_1.SoftwareVersion, fn_ListLatestApplicationCIs_1.IsSuperseded, fn_ListLatestApplicationCIs_1.NumberOfDeployments, fn_ListLatestApplicationCIs_1.CreatedBy, 
+                         fn_ListLatestApplicationCIs_1.LastModifiedBy, v_ApplicationAssignment.ApplicationName
+FROM            dbo.fn_ListLatestApplicationCIs(1033) AS fn_ListLatestApplicationCIs_1 INNER JOIN
+                         v_DeploymentSummary ON fn_ListLatestApplicationCIs_1.ModelID = v_DeploymentSummary.ModelID INNER JOIN
+                         v_ApplicationAssignment ON v_DeploymentSummary.ModelID = v_ApplicationAssignment.AppModelID
+GROUP BY fn_ListLatestApplicationCIs_1.DateCreated, fn_ListLatestApplicationCIs_1.DateLastModified, fn_ListLatestApplicationCIs_1.DisplayName, fn_ListLatestApplicationCIs_1.Manufacturer, 
+                         fn_ListLatestApplicationCIs_1.SoftwareVersion, fn_ListLatestApplicationCIs_1.CreatedBy, fn_ListLatestApplicationCIs_1.IsSuperseded, fn_ListLatestApplicationCIs_1.NumberOfDeployments, 
+                         fn_ListLatestApplicationCIs_1.LastModifiedBy, v_ApplicationAssignment.ApplicationName
+ORDER BY fn_ListLatestApplicationCIs_1.DateCreated DESC
